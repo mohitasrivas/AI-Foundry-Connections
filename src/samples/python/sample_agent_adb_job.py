@@ -31,6 +31,9 @@ from azure.identity import DefaultAzureCredential
 from azure.ai.agents.models import (FunctionTool, ToolSet)
 from typing import Any, Callable, Set
 
+DATABRICKS_ENTRA_ID_AUDIENCE_SCOPE = "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d/.default"
+# Well known Entra ID audience for Azure Databricks - https://learn.microsoft.com/en-us/azure/databricks/dev-tools/auth/user-aad-token
+
 
 FOUNDRY_PROJECT_ENDPOINT = "<FOUNDARY_PROJECT_ENDPOINT>"
 FOUNDRY_DATABRICKS_CONNECTION_NAME = "<FOUNDARY_DATABRICKS_CONNECTION_NAME>"
@@ -88,7 +91,7 @@ else:
 
 databricks_workspace_client = WorkspaceClient(
     host=connection.target,
-    token = credential.get_token("2ff814a6-3304-4ab8-85cb-cd0e6f879c1d/.default").token,
+    token = credential.get_token(DATABRICKS_ENTRA_ID_AUDIENCE_SCOPE).token,
 )
 print(f"Databricks workspace client created for host: {connection.target}")
 
