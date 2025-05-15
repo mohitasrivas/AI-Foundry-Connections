@@ -6,7 +6,7 @@
 """
 DESCRIPTION:
     This sample demonstrates how to use the Databricks connector in 
-    Azure AI Foundry with Databricks to access Genie.
+    Azure AI Foundry with Databricks to access Genie (Using Databricks AI Bridge).
 
 USAGE:
     python sample_agent_adb_genie.py
@@ -35,8 +35,8 @@ from typing import Any, Callable, Set
 DATABRICKS_ENTRA_ID_AUDIENCE_SCOPE = "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d/.default" 
 # Well known Entra ID audience for Azure Databricks - https://learn.microsoft.com/en-us/azure/databricks/dev-tools/auth/user-aad-token
 
-FOUNDRY_PROJECT_ENDPOINT = "<FOUNDARY_PROJECT_ENDPOINT>"
-FOUNDRY_DATABRICKS_CONNECTION_NAME = "<FOUNDARY_DATABRICKS_CONNECTION_NAME>"
+FOUNDRY_PROJECT_ENDPOINT = "<FOUNDRY_PROJECT_ENDPOINT>"
+FOUNDRY_DATABRICKS_CONNECTION_NAME = "<FOUNDRY_DATABRICKS_CONNECTION_NAME>"
 
 GENIE_QUESTION = "Describe my dataset"
 
