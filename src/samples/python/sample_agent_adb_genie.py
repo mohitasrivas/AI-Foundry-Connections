@@ -24,21 +24,30 @@ USAGE:
        the "Models + endpoints" tab in your Azure AI Foundry project.
 """
 
-import json
+import json, os
 from databricks.sdk import WorkspaceClient
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from databricks_ai_bridge.genie import Genie, GenieResponse
 from azure.ai.agents.models import (FunctionTool, ToolSet)
 from typing import Any, Callable, Set
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 
 DATABRICKS_ENTRA_ID_AUDIENCE_SCOPE = "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d/.default" 
 # Well known Entra ID audience for Azure Databricks - https://learn.microsoft.com/en-us/azure/databricks/dev-tools/auth/user-aad-token
 
-FOUNDRY_PROJECT_ENDPOINT = "<FOUNDRY_PROJECT_ENDPOINT>"
-FOUNDRY_DATABRICKS_CONNECTION_NAME = "<FOUNDRY_DATABRICKS_CONNECTION_NAME>"
+FOUNDRY_PROJECT_ENDPOINT = os.getenv("FOUNDRY_PROJECT_CONNECTION_STRING")
+FOUNDRY_DATABRICKS_CONNECTION_NAME = os.getenv("FOUNDRY_DATABRICKS_CONNECTION_NAME")
+FOUNDRY_DATABRICKS_AGENT_NAME = os.getenv("FOUNDRY_AGENT_NAME")
 
-GENIE_QUESTION = "Describe my dataset"
+
+GENIE_QUESTION = "Describe my dataset"  
+GENIE_QUESTION = "Which products have the highest sales revenue?"
+
 
 ##################
 # Utility functions
@@ -70,6 +79,10 @@ project_client = AIProjectClient(
 )
 print(f"AI Project client created for project endpoint: {FOUNDRY_PROJECT_ENDPOINT}")
 
+agents = project_client.agents.list_agents()
+print("Agents in this Project:")
+for agent in agents:
+    print(f"- {agent.name} (ID: {agent.id})")
 
 connection = project_client.connections.get(FOUNDRY_DATABRICKS_CONNECTION_NAME)
 print(f"Retrieved connection '{FOUNDRY_DATABRICKS_CONNECTION_NAME}' from AI project")
@@ -103,9 +116,11 @@ with project_client:
     project_client.agents.enable_auto_function_calls(toolset)
 
     agent = project_client.agents.create_agent(
-        model='<MODEL_DEPLOYMENT_NAME>',
-        name="Databricks Agent",
-        instructions="You're an helpful assistant, use the Databricks Genie to answer questions.",
+        model='gpt-4o',
+        name=FOUNDRY_DATABRICKS_AGENT_NAME,
+        instructions="You're an helpful assistant, use the Databricks Genie to answer questions. " \
+                    "You use the ask_genie function to answer the questions. Pass the question to the function and return the response." \
+                    "Format the response as a markdown code block.",
         toolset=toolset,
     )
 

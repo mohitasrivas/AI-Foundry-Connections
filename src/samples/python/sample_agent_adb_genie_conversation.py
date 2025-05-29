@@ -32,17 +32,28 @@ from azure.identity import DefaultAzureCredential
 from databricks.sdk.service.dashboards import GenieAPI
 from azure.ai.agents.models import (FunctionTool, ToolSet)
 from typing import Any, Callable, Set
-import json
+import json, os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 DATABRICKS_ENTRA_ID_AUDIENCE_SCOPE = "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d/.default" 
 # Well known Entra ID audience for Azure Databricks - https://learn.microsoft.com/en-us/azure/databricks/dev-tools/auth/user-aad-token
 
-FOUNDRY_PROJECT_ENDPOINT = "<FOUNDRY_PROJECT_ENDPOINT>"
-FOUNDRY_DATABRICKS_CONNECTION_NAME = "<FOUNDRY_DATABRICKS_CONNECTION_NAME>"
+FOUNDRY_PROJECT_ENDPOINT = os.getenv("FOUNDRY_PROJECT_CONNECTION_STRING")
+FOUNDRY_DATABRICKS_CONNECTION_NAME = os.getenv("FOUNDRY_DATABRICKS_CONNECTION_NAME")
+MODEL_DEPLOYMENT_NAME = os.getenv("OPENAI_MODEL_DEPLOYMENT")
+
 
 GENIE_QUESTION_1 = "What is the average transaction value?"
-
 GENIE_QUESTION_2 = "How many transactions were made that were above that value?"
+
+
+# Define the questions to ask Bakehouse Genie
+GENIE_QUESTION_1 = "What are the top-selling products by quantity sold?"
+GENIE_QUESTION_2 = "How much revenue did they generate?"
+
 
 ##################
 # Utility functions
@@ -165,7 +176,8 @@ with project_client:
         model='gpt-4o',
         name="Databricks Agent",
         instructions="You're an helpful assistant, use Databricks Genie to answer questions. " \
-        "Use the conversation_id returned by the first call to the ask_genie function to continue the conversation in Genie.",
+        "Use the conversation_id returned by the first call to the ask_genie function to continue the conversation in Genie." \
+        "You use the ask_genie function to answer the questions. Pass the question to the function and return the response.",
         toolset=toolset,
     )
 
